@@ -1,4 +1,5 @@
 import os  # The os module provides a portable way of using operating system dependent functionality.
+import shutil
 
 print(
     os.name
@@ -38,7 +39,20 @@ video_extensions = [
 ]
 
 
-def printFolder(path):
+def create_and_move_folder(source_path, destination_folder):
+    # Create a new folder
+    new_folder_path = os.path.join(destination_folder, "NewFolder")
+    os.makedirs(new_folder_path, exist_ok=True)
+
+    # Move files from the source path to the new folder
+    for file_name in os.listdir(source_path):
+        file_path = os.path.join(source_path, file_name)
+        if os.path.isfile(file_path):
+            shutil.move(file_path, os.path.join(new_folder_path, file_name))
+            print(f"Moved {file_name} to {new_folder_path}")
+
+
+def find_Photos_And_Videos(path):
     try:
         if os.path.exists(path):  # if the file path is an actual path
             files = os.listdir(
@@ -49,30 +63,21 @@ def printFolder(path):
                 file_path = os.path.join(
                     path, file
                 )  # Creates a file path by joining the path with the current file name
-                try:
-                    if os.path.isdir(
-                        file_path
-                    ):  # Checks to see if the current file is actually a folder
-                        # print(f"{file} is a directory.")  # prints the folder name
-                        # print("\n")
-                        printFolder(
-                            file_path
-                        )  # recursively uses the current folder to print the files that it contains
+                try:  # Checks to see if the current file is actually a folder
+                    if os.path.isdir(file_path):
+                        # recursively uses the current folder to print the files that it contains
+                        find_Photos_And_Videos(file_path)
                     else:
-                        # print(f"{file} is not a directory.")  # prints the file
                         file_extension = os.path.splitext(file)[1]
-                        if str(file_extension).lower() in (
-                            photo_extensions or video_extensions
-                        ):
-                            print(file)
-                            if file_extension.lower() == ".heic":
-                                print("iphone")
-                                break
+                        if str(file_extension).lower() in (photo_extensions):
+                            print(f"{file} is a photo.")
+                        if str(file_extension).lower() in (video_extensions):
+                            print(f"{file} is a video.")
 
-                except (
-                    PermissionError
-                ) as e:  # Some files are restricted so we need this except case
-                    print(f"PermissionError: {e}. Skipping {file_path}")
+                # Some files are restricted so we need this except case
+                except PermissionError as e:
+                    # print(f"PermissionError: {e}. Skipping {file_path}")
+                    continue
 
             # print("\nAll files printed")
             # print(count)
@@ -85,4 +90,4 @@ def printFolder(path):
         print(f"PermissionError: {e}. Skipping {path}")
 
 
-printFolder("/Volumes/Sandisk SSD")
+find_Photos_And_Videos("/Volumes/Sandisk SSD")
