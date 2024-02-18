@@ -98,6 +98,6 @@ def find_Photos_And_Videos(path):
         print(f"PermissionError: {e}. Skipping {path}")
 
 
-find_Photos_And_Videos("/Volumes/Sandisk SSD")
+# find_Photos_And_Videos("/Volumes/Sandisk SSD")
 
-print(f"{count} files moved!")
+# print(f"{count} files moved!")
